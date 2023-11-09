@@ -1,0 +1,18 @@
+---
+- name: Execute Docker backup and restore
+  hosts: host1,host2
+  become: true
+  tasks:
+    - name: Delete existing Docker backup
+      command: rm -f volume-backup1.tar.gz
+      ignore_errors: yes
+    - name: Create Docker backup
+      command: docker run --rm -v spring-volume:/app/src/main/resources/images -v /root:/backup alpine tar -czf /backup/volume-backup1.tar.gz -C /app/src/main/resources/images .
+
+    - name: Create a directory 
+      file: 
+        path: volume
+        state: directory
+        mode: 0755
+    - name: Restore Docker backup
+      command: tar -xzf volume-backup1.tar.gz volume/
