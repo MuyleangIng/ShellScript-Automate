@@ -56,4 +56,12 @@ echo "NGINX configuration file created: $nginxConfigDir/$nginxConfigName."
 echo "Symbolic link created in /etc/nginx/sites-enabled/$nginxConfigName."
 
 # Run Certbot after NGINX configuration is updated and container is ready
-certbot --nginx -d "$dns" --non-interactive
+if certbot --nginx -d "$dns" --non-interactive; then
+    echo "Certbot successful."
+    # Send a success message to Telegram with the domain
+    curl -s -X POST https://api.telegram.org/bot6678469501:AAGO8syPMTxn0gQGksBPRchC-EoC6QRoS5o/sendMessage -d chat_id=1162994521 -d text="NGINX configuration and Certbot successful for domain: $dns."
+else
+    echo "Certbot failed."
+    # Send an error message to Telegram with the domain
+    curl -s -X POST https://api.telegram.org/bot6678469501:AAGO8syPMTxn0gQGksBPRchC-EoC6QRoS5o/sendMessage -d chat_id=1162994521 -d text="Certbot failed for domain: $dns."
+fi
