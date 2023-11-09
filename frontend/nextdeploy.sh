@@ -121,6 +121,18 @@ done
 echo "You entered Image Name: $REPO_URL"
 
 echo "------------------------"
+echo "please input ip address"
+while true; do
+  read -p "Enter ipaddress: " ipaddress
+  if [ -n "$ipaddress" ] ; then
+    # Both inputs provided, exit the loop
+    break
+  else
+    echo " inputs are required. Please try again."
+  fi
+done
+echo "You entered ip address : $ipaddress"
+echo "------------------------"
 echo "Write full domain name"
 read dns
 # Read the desired NGINX configuration file name
@@ -170,7 +182,7 @@ server {
     server_name $dns;
 
     location / {
-        proxy_pass http://localhost:$containerPort;
+        proxy_pass http://$ipaddress:$containerPort;
         proxy_set_header Host \$host;
         proxy_set_header X-Real-IP \$remote_addr;
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
