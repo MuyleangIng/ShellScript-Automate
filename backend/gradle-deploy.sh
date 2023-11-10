@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Jenkins job details
-echo "Enter the Jenkins job to trigger: backend/gradleDeploy "
-read jobName
+echo "Enter the Jenkins job to trigger: "
+jobName="backend/gradleDeploy"
 echo "Triggering the $jobName job"
 
 # Jenkins server authentication
@@ -108,7 +108,7 @@ done
 echo "You entered Image Name: $CONTAINER_NAME"
 
 echo "------------------------"
-echo "Enter REPO_URL:  ex: https://gitlab.com/MuyleangIng1/reactjs"
+echo "Enter REPO_URL:  ex: https://github.com/MuyleangIng/swagger-gradle.git"
 while true; do
   read -p "Enter your url git : " REPO_URL
   if [ -n "$REPO_URL" ] ; then
@@ -120,6 +120,50 @@ while true; do
 done
 echo "You entered Image Name: $REPO_URL"
 
+echo "------------------------"
+echo "please input ip address 188.166.191.62 "
+while true; do
+  read -p "Enter ipaddress: " ipaddress
+  if [ -n "$ipaddress" ] ; then
+    # Both inputs provided, exit the loop
+    break
+  else
+    echo " inputs are required. Please try again."
+  fi
+done
+echo "You entered ip address : $ipaddress"
+
+# Input Domain name
+# echo "------------------------"
+# echo "Enter dns:  ex: sen-pai.live"
+# while true; do
+#   read -p "Enter your Domain Name : " dns
+#   if [ -n "$dns" ] ; then
+#     # Both inputs provided, exit the loop
+#     break
+#   else
+#     echo " inputs are required. Please try again."
+#   fi
+# done
+# echo "You entered Image Name: $dns"
+subdomain="api-$(date +%s)"
+curl -u 'muyleanging:c8c2397f4a299ed82757ff33c4326a07403586c1' 'https://api.name.com/v4/domains/sen-pai.live/records' -X POST -H 'Content-Type: application/json' --data '{"host":"'"$subdomain"'","type":"A","answer":"'"$ipaddress"'","ttl":300}'
+# Read the desired NGINX configuration file name
+echo "------------------------"
+echo "Enter the desired NGINX configuration file name (e.g., my_website):"
+while true; do
+  read -p "Enter directory for nginx : " nginxConfigName
+  if [ -n "$nginxConfigName" ] ; then
+    # Both inputs provided, exit the loop
+    break
+  else
+    echo " inputs are required. Please try again."
+  fi
+done
+echo "Here is you file site-aviable: $nginxConfigName"
+
+
+# Trigger the Jenkins job with user-defined environment variables
 
 java -jar jenkins-cli.jar -auth $user:$passwd -s $url -webSocket build -v \
     -p BUILD_DOCKER=$BUILD_DOCKER \
@@ -159,10 +203,10 @@ containerPort=$(docker inspect --format='{{(index (index .NetworkSettings.Ports 
 nginxConfigContent="
 server {
     listen 80;
-    server_name $dns;
+    server_name $subdomain.sen-pai.live;
 
     location / {
-        proxy_pass http://localhost:$containerPort;
+        proxy_pass http://$ipaddress:$containerPort;
         proxy_set_header Host \$host;
         proxy_set_header X-Real-IP \$remote_addr;
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
@@ -179,9 +223,29 @@ sudo ln -s "$nginxConfigDir/$nginxConfigName" "/etc/nginx/sites-enabled/$nginxCo
 # Reload NGINX to apply the changes
 sudo systemctl reload nginx  # Use 'service nginx reload' on some systems
 
-echo "NGINX configuration updated with server_name: $dns and container port: $containerPort."
+echo "NGINX configuration updated with server_name: $subdomain.sen-pai.live and container port: $containerPort."
 echo "NGINX configuration file created: $nginxConfigDir/$nginxConfigName."
 echo "Symbolic link created in /etc/nginx/sites-enabled/$nginxConfigName."
 
-# Run Certbot after NGINX configuration is updated
-certbot --nginx -d "$dns" --non-interactive
+# Run Certbot after NGINX configuration is updated and container is ready
+if certbot --nginx -d "$subdomain.sen-pai.live" --non-interactive; then
+    echo "Certbot successful."
+    # Send a success message to Telegram with the domain
+    curl -s -X POST https://api.telegram.org/bot6678469501:AAGO8syPMTxn0gQGksBPRchC-EoC6QRoS5o/sendMessage -d chat_id=-1002078205340 -d text="                             
+                ……….
+            ……………….......
+        ……       ✨       …
+    …    ✨              ✨ ….
+  ……           𝐜𝐨𝐧𝐠𝐫𝐚𝐭𝐳         ……
+………        👏    🎉   👍        ………
+  ……   ✨     ◝(ᵔᵕᵔ)◜     ✨  ……
+    << $subdomain.sen-pai.live >>
+                              …….
+        ……        ✨     ….
+                ……………....
+                 ……."
+else
+    echo "Certbot failed."
+    # Send an error message to Telegram with the domain
+    curl -s -X POST https://api.telegram.org/bot6678469501:AAGO8syPMTxn0gQGksBPRchC-EoC6QRoS5o/sendMessage -d chat_id=1162994521 -d text="Certbot failed for domain: $subdomain.sen-pai.live."
+fi

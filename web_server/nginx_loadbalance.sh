@@ -7,10 +7,34 @@ read -p "Enter port1: " port1
 echo "----------Enter server2 & port2--------------"
 read -p "Enter server2: " server2
 read -p "Enter port2: " port2
-echo "Write full domain name"
-read dns
+echo "------------------------"
+echo "please input ip address 188.166.191.62 "
+while true; do
+  read -p "Enter ipaddress: " ipaddress
+  if [ -n "$ipaddress" ] ; then
+    # Both inputs provided, exit the loop
+    break
+  else
+    echo " inputs are required. Please try again."
+  fi
+done
+echo "You entered ip address : $ipaddress"
+#input domain name
+subdomain="automatex-$(date +%s)"
+curl -u 'muyleanging:c8c2397f4a299ed82757ff33c4326a07403586c1' 'https://api.name.com/v4/domains/sen-pai.live/records' -X POST -H 'Content-Type: application/json' --data '{"host":"'"$subdomain"'","type":"A","answer":"'"$ipaddress"'","ttl":300}'
+# Read the desired NGINX configuration file name
+echo "------------------------"
 echo "Enter the desired NGINX configuration file name (e.g., my_website):"
-read nginxConfigName
+while true; do
+  read -p "Enter directory for nginx : " nginxConfigName
+  if [ -n "$nginxConfigName" ] ; then
+    # Both inputs provided, exit the loop
+    break
+  else
+    echo " inputs are required. Please try again."
+  fi
+done
+echo "Here is you file site-aviable: $nginxConfigName"
 
 # Check for empty input
 if [ -z "$server1" ] || [ -z "$port1" ] || [ -z "$server2" ] || [ -z "$port2" ] || [ -z "$dns" ] || [ -z "$nginxConfigName" ]; then
@@ -35,7 +59,7 @@ upstream $backend {
 }
 server {
     listen 80;
-    server_name $dns;
+    server_name $subdomain.sen-pai.live;
 
     location / {
         proxy_pass http://$backend;
@@ -51,17 +75,29 @@ sudo ln -s "$nginxConfigDir/$nginxConfigName" "/etc/nginx/sites-enabled/$nginxCo
 # Reload NGINX to apply the changes
 sudo systemctl reload nginx  # Use 'service nginx reload' on some systems
 
-echo "NGINX configuration updated with server_name: $dns and container port: $containerPort."
+echo "NGINX configuration updated with server_name: $subdomain.sen-pai.live and container port: $containerPort."
 echo "NGINX configuration file created: $nginxConfigDir/$nginxConfigName."
 echo "Symbolic link created in /etc/nginx/sites-enabled/$nginxConfigName."
 
 # Run Certbot after NGINX configuration is updated and container is ready
-if certbot --nginx -d "$dns" --non-interactive; then
+if certbot --nginx -d "$subdomain.sen-pai.live" --non-interactive; then
     echo "Certbot successful."
     # Send a success message to Telegram with the domain
-    curl -s -X POST https://api.telegram.org/bot6678469501:AAGO8syPMTxn0gQGksBPRchC-EoC6QRoS5o/sendMessage -d chat_id=1162994521 -d text="NGINX configuration and Certbot successful for domain: $dns."
+    curl -s -X POST https://api.telegram.org/bot6678469501:AAGO8syPMTxn0gQGksBPRchC-EoC6QRoS5o/sendMessage -d chat_id=-1002078205340 -d text="                             
+                ……….
+            ……………….......
+        ……       ✨       …
+    …    ✨              ✨ ….
+  ……           𝐜𝐨𝐧𝐠𝐫𝐚𝐭𝐳         ……
+………        👏    🎉   👍        ………
+  ……   ✨     ◝(ᵔᵕᵔ)◜     ✨  ……
+    << $subdomain.sen-pai.live >>
+                              …….
+        ……        ✨     ….
+                ……………....
+                 ……."
 else
     echo "Certbot failed."
     # Send an error message to Telegram with the domain
-    curl -s -X POST https://api.telegram.org/bot6678469501:AAGO8syPMTxn0gQGksBPRchC-EoC6QRoS5o/sendMessage -d chat_id=1162994521 -d text="Certbot failed for domain: $dns."
+    curl -s -X POST https://api.telegram.org/bot6678469501:AAGO8syPMTxn0gQGksBPRchC-EoC6QRoS5o/sendMessage -d chat_id=1162994521 -d text="Certbot failed for domain: $subdomain.sen-pai.live."
 fi
