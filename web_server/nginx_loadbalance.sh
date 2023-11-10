@@ -83,7 +83,8 @@ echo "Symbolic link created in /etc/nginx/sites-enabled/$nginxConfigName."
 if certbot --nginx -d "$subdomain.sen-pai.live" --non-interactive; then
     echo "Certbot successful."
     # Send a success message to Telegram with the domain
-    curl -s -X POST https://api.telegram.org/bot6678469501:AAGO8syPMTxn0gQGksBPRchC-EoC6QRoS5o/sendMessage -d chat_id=-1002078205340 -d text="                             
+    #-1002078205340
+    curl -s -X POST https://api.telegram.org/bot6678469501:AAGO8syPMTxn0gQGksBPRchC-EoC6QRoS5o/sendMessage -d chat_id=1162994521 -d text="                             
                 ……….
             ……………….......
         ……       ✨       …
@@ -101,3 +102,5 @@ else
     # Send an error message to Telegram with the domain
     curl -s -X POST https://api.telegram.org/bot6678469501:AAGO8syPMTxn0gQGksBPRchC-EoC6QRoS5o/sendMessage -d chat_id=1162994521 -d text="Certbot failed for domain: $subdomain.sen-pai.live."
 fi
+
+

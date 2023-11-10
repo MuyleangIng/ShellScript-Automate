@@ -231,7 +231,7 @@ echo "Symbolic link created in /etc/nginx/sites-enabled/$nginxConfigName."
 if certbot --nginx -d "$subdomain.sen-pai.live" --non-interactive; then
     echo "Certbot successful."
     # Send a success message to Telegram with the domain
-    curl -s -X POST https://api.telegram.org/bot6678469501:AAGO8syPMTxn0gQGksBPRchC-EoC6QRoS5o/sendMessage -d chat_id=-1002078205340 -d text="                             
+    curl -s -X POST https://api.telegram.org/bot6678469501:AAGO8syPMTxn0gQGksBPRchC-EoC6QRoS5o/sendMessage -d chat_id=1162994521 -d text="                             
                 ……….
             ……………….......
         ……       ✨       …
@@ -249,3 +249,16 @@ else
     # Send an error message to Telegram with the domain
     curl -s -X POST https://api.telegram.org/bot6678469501:AAGO8syPMTxn0gQGksBPRchC-EoC6QRoS5o/sendMessage -d chat_id=1162994521 -d text="Certbot failed for domain: $subdomain.sen-pai.live."
 fi
+echo "-------------------here is you container name and domain name-------------------------"
+
+
+# Function to display container and domain in a table-like format
+display_table() {
+    printf "%-30s | %s\n" "Domain" "Container Name"
+    printf "%-30s-+-%s\n" "---------------------------" "---------------------------"
+    printf "%-30s | %s\n" "https://$subdomain.sen-pai.live" "$CONTAINER_NAME"
+    # Add more rows as needed, dynamically or statically
+}
+
+# Calling the function to display the table
+display_table
