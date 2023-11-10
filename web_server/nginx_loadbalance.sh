@@ -9,38 +9,15 @@ read -p "Enter server2: " server2
 read -p "Enter port2: " port2
 echo "------------------------"
 echo "please input ip address 188.166.191.62 "
-while true; do
-  read -p "Enter ipaddress: " ipaddress
-  if [ -n "$ipaddress" ] ; then
-    # Both inputs provided, exit the loop
-    break
-  else
-    echo " inputs are required. Please try again."
-  fi
-done
-echo "You entered ip address : $ipaddress"
+read -p "Enter ipaddress: " ipaddress
+  
 #input domain name
 subdomain="automatex-$(date +%s)"
 curl -u 'muyleanging:c8c2397f4a299ed82757ff33c4326a07403586c1' 'https://api.name.com/v4/domains/sen-pai.live/records' -X POST -H 'Content-Type: application/json' --data '{"host":"'"$subdomain"'","type":"A","answer":"'"$ipaddress"'","ttl":300}'
 # Read the desired NGINX configuration file name
 echo "------------------------"
 echo "Enter the desired NGINX configuration file name (e.g., my_website):"
-while true; do
-  read -p "Enter directory for nginx : " nginxConfigName
-  if [ -n "$nginxConfigName" ] ; then
-    # Both inputs provided, exit the loop
-    break
-  else
-    echo " inputs are required. Please try again."
-  fi
-done
-echo "Here is you file site-aviable: $nginxConfigName"
-
-# Check for empty input
-if [ -z "$server1" ] || [ -z "$port1" ] || [ -z "$server2" ] || [ -z "$port2" ] || [ -z "$dns" ] || [ -z "$nginxConfigName" ]; then
-    echo "One or more fields were left empty. Exiting."
-    exit 1
-fi
+read -p "Enter directory for nginx : " nginxConfigName
 
 nginxConfigDir="/etc/nginx/sites-available"
 nginxConfigPath="$nginxConfigDir/$nginxConfigName"
